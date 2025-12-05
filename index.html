@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> Hùng</title>
+<title> Hùng tạo công ăn việc làm</title>
 <style>
 body{
   margin:0; font-family:sans-serif;
@@ -12,11 +12,19 @@ body{
 }
 
 /* LOGIN / INTRO */
+@keyframes shake {
+  0% { transform: translate(-50%, -50%) translateX(0); }
+  25% { transform: translate(-50%, -50%) translateX(-5px); }
+  50% { transform: translate(-50%, -50%) translateX(5px); }
+  75% { transform: translate(-50%, -50%) translateX(-5px); }
+  100% { transform: translate(-50%, -50%) translateX(0); }
+}
 #intro{
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   text-align:center;
-  background: linear-gradient(135deg,#ffd1dc,#ffb6c1); /* Nền login pastel */
+  background: linear-gradient(135deg,#ff4d94,#ff66b3);
   padding:30px; border-radius:20px; box-shadow:0 0 20px rgba(0,0,0,0.3);
+  animation: shake 1s infinite;
 }
 #intro h1{font-size:2em; margin-bottom:10px;}
 #intro input{padding:10px; font-size:1em;}
@@ -41,8 +49,11 @@ body{
 #gameDiv{
   width:100%; height:70vh; background: rgba(255,192,203,0.2);
   border-radius:20px; 
-  border:6px solid #ff1493; /* Viền khung chơi tô đậm */
+  border:6px solid #ff1493;
   overflow:hidden; position:relative; box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
+#dangerLine{
+  position:absolute; bottom:0; left:0; width:100%; height:5px; background:red; opacity:0.5;
 }
 #gameInfo{width:100%; margin-top:10px; text-align:center;}
 #scoreboard{font-size:1.5em; color:#333;}
@@ -54,23 +65,25 @@ body{
 .icon:hover{transform:scale(1.5); filter:drop-shadow(0 0 5px #fff);}
 
 /* BUTTONS OUTSIDE */
-#rulesBtn{
-  position:absolute; top:10px; left:10px; padding:10px 15px; border:none; border-radius:8px;
+#rulesBtn,#exchangeBtn{
+  position:absolute; top:10px; padding:10px 15px; border:none; border-radius:8px;
   background:#ff69b4; color:#fff; cursor:pointer; z-index:5;
 }
+#rulesBtn{left:10px;}
+#exchangeBtn{right:10px;}
 
 /* MODALS */
-#rulesModal,#gameOverModal{
+#rulesModal,#gameOverModal,#exchangeModal{
   display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   width:300px;padding:20px; background:#fff; border-radius:10px;
   box-shadow:0 0 20px rgba(0,0,0,0.5); text-align:center; z-index:10;
 }
-#rulesModal button,#gameOverModal button{
+#rulesModal button,#gameOverModal button,#exchangeModal button{
   padding:10px 20px; margin-top:15px; cursor:pointer; border:none; border-radius:8px; background:#ff69b4; color:#fff;
 }
 
 /* BY HUNG */
-#byHung{position:absolute; bottom:10px; left:10px; color:#fff; font-weight:bold; font-size:1em; animation:fall 3s infinite;}
+#byHung{position:absolute; bottom:10px; left:10px; color:#fff; font-weight:bold; font-size:1em; text-shadow:1px 1px 2px rgba(0,0,0,0.5); animation:fall 3s infinite;}
 @keyframes fall{0%{transform:translateY(-20px); opacity:0;} 50%{opacity:1;} 100%{transform:translateY(0); opacity:1;}}
 
 /* POPUP TRỪ ĐIỂM */
@@ -82,7 +95,7 @@ body{
 
 <!-- LOGIN / INTRO -->
 <div id="intro">
-  <h1 id="welcomeText">Nhấp vô là có xiền 🤑</h1>
+  <h1 id="welcomeText"> Kím tiền ko khó 🤑</h1>
   <input type="text" id="playerNameInput" placeholder="Nhập tên của bạn">
   <button id="startBtn">Bắt đầu</button>
 </div>
@@ -95,27 +108,40 @@ body{
 
 <!-- GAME -->
 <div id="gameContainer">
-  <div id="gameDiv"></div>
+  <div id="gameDiv">
+    <div id="dangerLine"></div>
+  </div>
   <div id="gameInfo">
     <div id="scoreboard">Điểm: 0 | Mạng: 10/10</div>
     <div id="healthBar"><div id="healthBarInner"></div></div>
   </div>
 </div>
 
-<!-- RULES MODAL -->
+<!-- BUTTONS -->
 <button id="rulesBtn">❔ Thể lệ</button>
+<button id="exchangeBtn">💰 Đổi điểm</button>
+
+<!-- RULES MODAL -->
 <div id="rulesModal">
-  <h2>Luật</h2>
+  <h2>Thể lệ Game</h2>
   <ul style="text-align:left">
     <li>⚡ +10 điểm</li>
     <li>❤️ +1 điểm</li>
     <li>💎 +2 điểm</li>
     <li>🍀 +5 điểm</li>
     <li>🎁 +3 điểm</li>
-    <li>🌝 Nhấn bị trừ điểm 1–200</li>
+    <li>🌝 Nhấn để trừ điểm 1–200</li>
     <li>Mỗi người chơi có 10 mạng</li>
+    <li>Thanh đỏ cuối khung: các icon (ngoại trừ 🌝) nếu rơi chạm → mất 1 mạng</li>
   </ul>
   <button id="closeRules">Đóng</button>
+</div>
+
+<!-- EXCHANGE MODAL -->
+<div id="exchangeModal">
+  <h2>Đổi điểm sang phần thưởng</h2>
+  <p id="exchangeInfo"></p>
+  <button id="confirmExchange">Xác nhận</button>
 </div>
 
 <!-- GAME OVER -->
@@ -197,13 +223,18 @@ function spawnIcons(){
   iconEl.style.top='-50px';
   gameDiv.appendChild(iconEl);
 
+  const fallSpeed = Math.random() * 3 + 2; // 2~5px/20ms
   const fallInterval=setInterval(()=>{
     let top=parseFloat(iconEl.style.top);
-    if(top+50>=gameRect.height){
+    if(top + 50 >= gameRect.height){
       clearInterval(fallInterval);
       iconEl.remove();
-      updateScoreBoard();
-    }else iconEl.style.top=(top+2)+'px';
+      if(iconType.icon !== '🌝'){
+        health -= 1;
+        updateScoreBoard();
+        checkGameOver();
+      }
+    }else iconEl.style.top=(top + fallSpeed)+'px';
   },20);
 
   iconEl.addEventListener('click', ()=>{
@@ -218,8 +249,10 @@ function spawnIcons(){
     updateScoreBoard();
   });
 
-  setTimeout(spawnIcons,1000);
+  const nextSpawn = Math.random() * 700 + 300; // 0.3~1s
+  setTimeout(spawnIcons, nextSpawn);
 }
+
 function pickIcon(){
   const rand=Math.random(); let sum=0;
   for(const it of iconTypes){sum+=it.rate; if(rand<=sum) return it;}
@@ -260,8 +293,26 @@ const closeRules=document.getElementById('closeRules');
 rulesBtn.addEventListener('click',()=>{rulesModal.style.display='block'; gameRunning=false;});
 closeRules.addEventListener('click',()=>{rulesModal.style.display='none'; if(playerName!=='hungadmin') gameRunning=true; spawnIcons();});
 
+// --- EXCHANGE ---
+const exchangeBtn=document.getElementById('exchangeBtn');
+const exchangeModal=document.getElementById('exchangeModal');
+const exchangeInfo=document.getElementById('exchangeInfo');
+const confirmExchange=document.getElementById('confirmExchange');
+
+exchangeBtn.addEventListener('click',()=>{
+  gameRunning=false;
+  if(score>=1500) exchangeInfo.textContent="Bạn có đủ điểm! 📸 Cap màn hình gửi cho Hùng để nhận thưởng 💰";
+  else exchangeInfo.textContent="Xin lỗi, chưa đủ điểm nha ní 🥹";
+  exchangeModal.style.display='block';
+});
+
+confirmExchange.addEventListener('click',()=>{
+  exchangeModal.style.display='none';
+  if(playerName!=='hungadmin') gameRunning=true;
+});
+
 // --- LƯU DỮ LIỆU ---
 setInterval(()=>{if(playerName) localStorage.setItem(playerName,JSON.stringify({score,health}));},2000);
 </script>
 </body>
-  </html>
+</html>
