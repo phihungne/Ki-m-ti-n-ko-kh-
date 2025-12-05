@@ -2,414 +2,177 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Game của Hùng</title>
+<title>Tài Xỉu – Casino</title>
 <style>
+    body {
+        background: #111;
+        font-family: Arial;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
 
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #ffb6db;
-}
+    h1 {
+        margin-bottom: 10px;
+    }
 
-/* LOGIN */
-.login-screen {
-    position: fixed;
-    inset: 0;
-    background: #ffb6db;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    #gameBox {
+        width: 350px;
+        margin: auto;
+        padding: 20px;
+        background: #222;
+        border-radius: 15px;
+        box-shadow: 0 0 20px #ff0066;
+    }
 
-.loginBox {
-    background: white;
-    padding: 30px;
-    width: 300px;
-    border-radius: 18px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.25);
-    animation: shake 3s infinite ease-in-out;
-    text-align: center;
-}
+    button {
+        padding: 10px 20px;
+        margin: 10px;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
 
-@keyframes shake {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(6px); }
-    100% { transform: translateX(0); }
-}
+    #taiBtn { background: #ff0066; }
+    #xiuBtn { background: #0099ff; }
 
-.loginBox input {
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    border-radius:10px;
-    border:1px solid #aaa;
-    font-size: 16px;
-}
+    button:hover {
+        transform: scale(1.1);
+    }
 
-.loginBox button {
-    width:100%;
-    padding:10px;
-    border-radius:10px;
-    background:#ff4fa5;
-    color:white;
-    font-size:17px;
-    font-weight:bold;
-    cursor:pointer;
-    border:none;
-}
+    #result {
+        font-size: 22px;
+        margin-top: 15px;
+        font-weight: bold;
+    }
 
-.byhung {
-    margin-top: 15px;
-    font-size: 14px;
-    color:#ff3b92;
-}
+    #history {
+        margin-top: 20px;
+        padding: 10px;
+        background: #333;
+        border-radius: 10px;
+        height: 150px;
+        overflow-y: auto;
+        text-align: left;
+    }
 
-/* NÚT THỂ LỆ */
-.rules-btn {
-  margin-top: 12px;
-  background: #ff6fa8;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  border:none;
-}
+    .diceBox {
+        font-size: 40px;
+        letter-spacing: 20px;
+        margin: 15px;
+    }
 
-/* POPUP THỂ LỆ */
-.rules-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(3px);
-  justify-content: center;
-  align-items: center;
-}
+    input {
+        padding: 10px;
+        width: 200px;
+        border-radius: 10px;
+        border: none;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 18px;
+    }
 
-.rules-content {
-  background: #fff;
-  padding: 20px;
-  width: 280px;
-  border-radius: 18px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-  animation: pop .25s ease;
-}
-
-@keyframes pop {
-  from { transform: scale(0.8); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
-.close-btn {
-  width: 100%;
-  padding: 10px;
-  margin-top: 15px;
-  background: #ff5f9e;
-  color: white;
-  border-radius: 10px;
-  font-weight:bold;
-  cursor: pointer;
-  border:none;
-}
-
-/* GAME */
-.game-screen {
-    display:none;
-    padding-top:20px;
-    text-align:center;
-}
-
-#gameContainer {
-    width: 300px;
-    height: 420px;
-    margin: 0 auto;
-    border: 4px solid hotpink;
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-    background: #fff;
-}
-
-/* LINE ĐỎ */
-#deathLine {
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:4px;
-    background:red;
-}
-
-/* ICON */
-.icon {
-    position: absolute;
-    top: -40px;
-    font-size: 35px;
-    cursor: pointer;
-    user-select:none;
-    transition: transform 0.1s;
-}
-
-.icon:hover {
-    transform: scale(1.35);
-}
-
-/* DƯỚI KHUNG */
-.bottomBar {
-    margin-top: 12px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-/* SHOP */
-.shop-btn {
-    margin-top: 10px;
-    background: #ff8dcf;
-    padding: 10px 20px;
-    border-radius: 12px;
-    cursor:pointer;
-    color:white;
-    font-weight:bold;
-    border:none;
-}
-
-.shop-modal {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.4);
-    backdrop-filter:blur(2px);
-    justify-content:center;
-    align-items:center;
-}
-
-.shop-box {
-    background:white;
-    padding:20px;
-    width:260px;
-    border-radius:16px;
-    text-align:center;
-    animation: pop .25s ease;
-}
-
-.reward {
-    width:100%;
-    padding:10px;
-    margin:8px 0;
-    border-radius:12px;
-    background:#ffd6ef;
-    font-weight:bold;
-    cursor:pointer;
-    border:none;
-}
-
-.close-shop {
-    margin-top:10px;
-    background:#ff5f9e;
-    padding:10px;
-    width:100%;
-    color:white;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:bold;
-    border:none;
-}
-
+    #moneyBox {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen" class="login-screen">
-    <div class="loginBox">
-        <h1>Nhấp vô là có xiền 🤑</h1>
-        <input id="playerName" type="text" placeholder="Nhập tên..." />
-        <button id="loginBtn">Bắt đầu</button>
+<h1>🎲 TÀI XỈU – Hùng Casino 🎲</h1>
 
-        <!-- nút thể lệ -->
-        <button id="rulesBtn" class="rules-btn">❔ Thể lệ</button>
+<div id="gameBox">
 
-        <div class="byhung">by Hùng 💖</div>
-    </div>
-</div>
+    <div id="moneyBox">💰 Tiền hiện có: <span id="money">10000</span></div>
 
-<!-- POPUP THỂ LỆ -->
-<div id="rulesModal" class="rules-modal">
-    <div class="rules-content">
-        <h2>📜 Thể lệ</h2>
+    <input id="bet" type="number" placeholder="Nhập số tiền cược">
 
-        <p>⚡ +10 điểm</p>
-        <p>❤️ +1 điểm</p>
-        <p>💎 +2 điểm</p>
-        <p>🍀 +5 điểm</p>
-        <p>🎁 +3 điểm</p>
-        <p>🌝 Trừ 1–200 điểm khi BẤM (không bấm thì không sao)</p>
-        <p>🔻 Icon chạm thanh đỏ → mất 1 máu (trừ 🌝)</p>
-        <p>🛒 Shop → đổi điểm lấy quà</p>
-
-        <button id="closeRules" class="close-btn">Đóng</button>
-    </div>
-</div>
-
-<!-- GAME -->
-<div id="gameScreen" class="game-screen">
-
-    <div id="gameContainer">
-        <div id="iconArea"></div>
-        <div id="deathLine"></div>
+    <div>
+        <button id="taiBtn" onclick="choose('tai')">TÀI</button>
+        <button id="xiuBtn" onclick="choose('xiu')">XỈU</button>
     </div>
 
-    <div class="bottomBar">
-        <div id="scoreDisplay">Điểm: 0</div>
-        <div id="healthDisplay">Máu: ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div>
-    </div>
+    <div class="diceBox" id="dice">⚀ ⚀ ⚀</div>
 
-    <button id="shopBtn" class="shop-btn">🛒 Shop</button>
+    <button onclick="play()" style="background:#00cc66;">🎯 QUAY</button>
+    <button onclick="resetMoney()" style="background:#ffbb00;">↻ Reset tiền</button>
 
-    <div id="shopModal" class="shop-modal">
-        <div class="shop-box">
-            <h2>🎁 Đổi điểm</h2>
+    <div id="result"></div>
 
-            <button class="reward" data-cost="1500">1500 điểm → 10k</button>
-            <button class="reward" data-cost="3000">3000 điểm → 20k</button>
-
-            <button id="closeShop" class="close-shop">Đóng</button>
-        </div>
-    </div>
+    <div id="history"></div>
 
 </div>
-
 
 <script>
-let gameRunning = false;
-let score = 0;
-let health = 10;
-let spawnSpeed = 850;
-let inLogin = true;
+let betType = "";
+let money = 10000;
 
-const loginScreen = document.getElementById("loginScreen");
-const gameScreen = document.getElementById("gameScreen");
-const nameInput = document.getElementById("playerName");
-const loginBtn = document.getElementById("loginBtn");
-
-const scoreDisplay = document.getElementById("scoreDisplay");
-const healthDisplay = document.getElementById("healthDisplay");
-const iconArea = document.getElementById("iconArea");
-
-function updateHealth() {
-    let hearts = "";
-    for (let i=0;i<health;i++) hearts += "❤️";
-    healthDisplay.innerHTML = "Máu: " + hearts;
+function choose(type){
+    betType = type;
+    if(type === "tai"){
+        document.getElementById("result").innerHTML = "Bạn chọn: <b>TÀI</b>";
+    } else {
+        document.getElementById("result").innerHTML = "Bạn chọn: <b>XỈU</b>";
+    }
 }
 
-loginBtn.onclick = () => {
-    if (!nameInput.value.trim()) return;
+function play() {
+    let bet = Number(document.getElementById("bet").value);
+    if(bet <= 0 || isNaN(bet)){
+        alert("Nhập tiền cược hợp lệ!");
+        return;
+    }
 
-    inLogin = false;
+    if(bet > money){
+        alert("Không đủ tiền!");
+        return;
+    }
 
-    loginScreen.style.display = "none";
-    gameScreen.style.display = "block";
+    if(betType === ""){
+        alert("Chọn TÀI hoặc XỈU trước!");
+        return;
+    }
 
-    setTimeout(() => {
-        alert("Bạn đã sẵn sàng chưa?");
-        gameRunning = true;
-        spawnLoop();
-    }, 200);
-};
+    // xúc xắc random
+    let d1 = Math.floor(Math.random() * 6) + 1;
+    let d2 = Math.floor(Math.random() * 6) + 1;
+    let d3 = Math.floor(Math.random() * 6) + 1;
 
-const icons = [
-    { emoji:"⚡", point:10 },
-    { emoji:"❤️", point:1 },
-    { emoji:"💎", point:2 },
-    { emoji:"🍀", point:5 },
-    { emoji:"🎁", point:3 },
-    { emoji:"🌝", point:"minus" }
-];
+    document.getElementById("dice").innerHTML = convert(d1) + " " + convert(d2) + " " + convert(d3);
 
-function spawnIcon() {
-    if (!gameRunning) return;
+    let sum = d1 + d2 + d3;
+    let kq = "";
 
-    const icon = document.createElement("div");
-    icon.classList.add("icon");
+    if(sum >= 11 && sum <= 17) kq = "tai";
+    else kq = "xiu";
 
-    const pick = icons[Math.floor(Math.random()*icons.length)];
-    icon.innerHTML = pick.emoji;
+    if(kq === betType){
+        money += bet;
+        document.getElementById("result").innerHTML = `Kết quả: ${sum} → <b>THẮNG +${bet}</b>`;
+    } else {
+        money -= bet;
+        document.getElementById("result").innerHTML = `Kết quả: ${sum} → <b>THUA -${bet}</b>`;
+    }
 
-    icon.style.left = Math.random() * 240 + "px";
+    document.getElementById("money").innerText = money;
 
-    icon.onclick = () => {
-        if (pick.point === "minus") {
-            let loss = Math.floor(Math.random()*200)+1;
-            score -= loss;
-        } else {
-            score += pick.point;
-        }
-        scoreDisplay.innerText = "Điểm: " + score;
-        icon.remove();
-    };
-
-    iconArea.appendChild(icon);
-
-    let fall = setInterval(() => {
-        if (!gameRunning) return;
-
-        let y = parseInt(icon.style.top || -40);
-        icon.style.top = (y + 6) + "px";
-
-        if (y > 360) {
-            if (pick.point !== "minus") {
-                health--;
-                updateHealth();
-            }
-            icon.remove();
-            clearInterval(fall);
-        }
-
-        if (health <= 0) {
-            gameRunning = false;
-            alert("💀 Thua rồi!");
-        }
-
-    }, 28);
+    // lưu lịch sử
+    let his = document.getElementById("history");
+    his.innerHTML = `<div>🎲 ${d1}-${d2}-${d3} = ${sum} (${kq.toUpperCase()})</div>` + his.innerHTML;
 }
 
-function spawnLoop() {
-    spawnIcon();
-    setTimeout(spawnLoop, spawnSpeed);
+function convert(n){
+    return ["⚀","⚁","⚂","⚃","⚄","⚅"][n-1];
 }
 
-/* SHOP */
-document.querySelectorAll(".reward").forEach(btn=>{
-    btn.onclick = () => {
-        let cost = Number(btn.dataset.cost);
-        if (score >= cost) {
-            alert("📸 Cap màn hình và gửi cho Hùng 💖");
-        } else {
-            alert("Chưa đủ điểm 😢");
-        }
-    };
-});
-
-document.getElementById("shopBtn").onclick = () => {
-    gameRunning = false;
-    document.getElementById("shopModal").style.display = "flex";
-};
-
-document.getElementById("closeShop").onclick = () => {
-    document.getElementById("shopModal").style.display = "none";
-    gameRunning = true;
-};
-
-/* THỂ LỆ */
-document.getElementById("rulesBtn").onclick = () => {
-    document.getElementById("rulesModal").style.display = "flex";
-};
-
-document.getElementById("closeRules").onclick = () => {
-    document.getElementById("rulesModal").style.display = "none";
-};
+function resetMoney(){
+    money = 10000;
+    document.getElementById("money").innerText = money;
+    document.getElementById("result").innerHTML = "Đã reset tiền!";
+}
 </script>
 
 </body>
