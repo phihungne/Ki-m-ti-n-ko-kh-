@@ -1,546 +1,416 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Flow Game by Hùng — Final</title>
+<meta charset="UTF-8">
+<title>Game của Hùng</title>
 <style>
-/* --- Layout & body classes to avoid background switching --- */
-html,body{height:100%;margin:0;padding:0;font-family:Helvetica,Arial,sans-serif;}
-body.login-page{
-  background: linear-gradient(135deg,#ff8ac6,#ffb3d9,#ffe6f2);
-  background-size:cover;
-  background-attachment:fixed;
-}
-body.game-page{
-  /* keep pink-ish so it never turns white */
-  background: linear-gradient(135deg,#ff8ac6,#ffb3d9,#ffe6f2);
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #ffb6db;
 }
 
-/* --- Centered small login form (full-screen background) --- */
-#intro {
-  position:fixed;
-  top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  width:340px;
-  padding:28px;
-  background: rgba(255,255,255,0.94);
-  border-radius:14px; /* A: bo góc nhẹ */
-  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-  text-align:center;
-  z-index:50;
-  /* small shake on appear */
-  animation: appear 0.35s ease, shake 1s ease 0.15s;
-}
-@keyframes appear{from{opacity:0;transform:translate(-50%,-52%) scale(.98)} to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-@keyframes shake{
-  0%{transform:translate(-50%,-50%) rotate(0deg)}
-  25%{transform:translate(-50%,-50%) rotate(-0.6deg)}
-  50%{transform:translate(-50%,-50%) rotate(0.6deg)}
-  75%{transform:translate(-50%,-50%) rotate(-0.4deg)}
-  100%{transform:translate(-50%,-50%) rotate(0)}
+/* LOGIN */
+.login-screen {
+    position: fixed;
+    inset: 0;
+    background: #ffb6db;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Login inputs */
-#playerNameInput{width:86%; padding:10px 12px; font-size:16px; border-radius:10px; border:2px solid #ff66a3;}
-#startBtn{margin-top:12px;padding:10px 20px;background:#ff4d94;color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer}
-#startBtn:active{transform:scale(.98)}
-
-/* Small rules box separated (outside login) */
-#rulesBox{
-  position:fixed;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:24px;
-  width:360px;
-  max-width:90%;
-  background:#fff;
-  padding:12px 16px;
-  border-radius:12px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.12);
-  font-size:13.5px;
-  text-align:left;
-  z-index:40;
+.loginBox {
+    background: white;
+    padding: 30px;
+    width: 300px;
+    border-radius: 18px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.25);
+    animation: shake 3s infinite ease-in-out;
+    text-align: center;
 }
 
-/* by Hùng bottom-left */
-#byHung{
-  position:fixed; left:14px; bottom:10px;
-  color:#fff; font-weight:700; text-shadow:0 2px 6px rgba(0,0,0,0.45);
-  z-index:60;
+@keyframes shake {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(6px); }
+    100% { transform: translateX(0); }
 }
 
-/* --- Game UI (hidden at login) --- */
-#gameWrapper{display:none; width:100%; height:100%; position:fixed; top:0; left:0; z-index:30;}
-#gameCenter{
-  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  width:360px; height:560px; /* game box */
-  border-radius:14px; background: rgba(255,255,255,0.98);
-  border:6px solid #ff1493; box-shadow:0 12px 30px rgba(0,0,0,0.18);
-  overflow:hidden;
+.loginBox input {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:10px;
+    border:1px solid #aaa;
+    font-size: 16px;
 }
-#dangerLine{ position:absolute; bottom:0; left:0; width:100%; height:6px; background:rgba(255,0,0,0.55); z-index:5;}
 
-/* icons */
-.icon{ position:absolute; font-size:2.5em; cursor:pointer; user-select:none; transition:transform .12s, filter .12s; z-index:15; }
-.icon:hover{ transform:scale(1.45); filter:drop-shadow(0 6px 12px rgba(0,0,0,0.15)); }
-
-/* HUD under game box */
-#hud{ display:none; position:fixed; left:50%; transform:translateX(-50%); top: calc(50% + 320px); width:380px; max-width:95%; text-align:center; z-index:35;}
-#scoreboard{ background:#fff; padding:10px 16px; border-radius:10px; box-shadow:0 8px 18px rgba(0,0,0,0.12); border:3px solid #ff4da6; font-size:16px; }
-
-/* Modals */
-.modal { display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:320px; background:#fff; padding:18px; border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,0.25); z-index:80; text-align:center;}
-.modal button{ margin-top:12px; padding:10px 16px; border-radius:8px; border:none; background:#ff4d94; color:#fff; cursor:pointer;}
-
-/* exchange inside shop */
-.exchangeOption{ display:block; width:100%; margin:8px 0; padding:10px; border-radius:8px; border:1px solid #ffb0d0; background:#fff; cursor:pointer; text-align:left; }
-
-/* minus popup when losing points */
-#minusPopup{ position:fixed; pointer-events:none; color:#ff2b2b; font-weight:800; font-size:18px; text-shadow:0 1px 2px rgba(0,0,0,0.25); z-index:100; }
-
-/* small responsiveness */
-@media (max-width:420px){
-  #intro{width:90%; padding:20px}
-  #gameCenter{width:88vw;height:70vh}
-  #hud{top: calc(50% + 40vh)}
+.loginBox button {
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    background:#ff4fa5;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    border:none;
 }
+
+.byhung {
+    margin-top: 15px;
+    font-size: 14px;
+    color:#ff3b92;
+}
+
+/* NÚT THỂ LỆ */
+.rules-btn {
+  margin-top: 12px;
+  background: #ff6fa8;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  border:none;
+}
+
+/* POPUP THỂ LỆ */
+.rules-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(3px);
+  justify-content: center;
+  align-items: center;
+}
+
+.rules-content {
+  background: #fff;
+  padding: 20px;
+  width: 280px;
+  border-radius: 18px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  animation: pop .25s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.close-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 15px;
+  background: #ff5f9e;
+  color: white;
+  border-radius: 10px;
+  font-weight:bold;
+  cursor: pointer;
+  border:none;
+}
+
+/* GAME */
+.game-screen {
+    display:none;
+    padding-top:20px;
+    text-align:center;
+}
+
+#gameContainer {
+    width: 300px;
+    height: 420px;
+    margin: 0 auto;
+    border: 4px solid hotpink;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* LINE ĐỎ */
+#deathLine {
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:4px;
+    background:red;
+}
+
+/* ICON */
+.icon {
+    position: absolute;
+    top: -40px;
+    font-size: 35px;
+    cursor: pointer;
+    user-select:none;
+    transition: transform 0.1s;
+}
+
+.icon:hover {
+    transform: scale(1.35);
+}
+
+/* DƯỚI KHUNG */
+.bottomBar {
+    margin-top: 12px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* SHOP */
+.shop-btn {
+    margin-top: 10px;
+    background: #ff8dcf;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+    border:none;
+}
+
+.shop-modal {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(2px);
+    justify-content:center;
+    align-items:center;
+}
+
+.shop-box {
+    background:white;
+    padding:20px;
+    width:260px;
+    border-radius:16px;
+    text-align:center;
+    animation: pop .25s ease;
+}
+
+.reward {
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:12px;
+    background:#ffd6ef;
+    font-weight:bold;
+    cursor:pointer;
+    border:none;
+}
+
+.close-shop {
+    margin-top:10px;
+    background:#ff5f9e;
+    padding:10px;
+    width:100%;
+    color:white;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    border:none;
+}
+
 </style>
 </head>
-<body class="login-page">
+<body>
 
-<!-- LOGIN (full-screen background, small form centered, bo góc A) -->
-<div id="intro" aria-live="polite">
-  <h2 style="margin:6px 0 8px 0">Nhấp vô là có xiền 🤑</h2>
-  <input id="playerNameInput" placeholder="Nhập tên của bạn" autocomplete="off" />
-  <br/>
-  <button id="startBtn">Bắt đầu</button>
-  <div style="font-size:12px;margin-top:10px;color:#666">by Hùng 💖</div>
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+    <div class="loginBox">
+        <h1>Nhấp vô là có xiền 🤑</h1>
+        <input id="playerName" type="text" placeholder="Nhập tên..." />
+        <button id="loginBtn">Bắt đầu</button>
+
+        <!-- nút thể lệ -->
+        <button id="rulesBtn" class="rules-btn">❔ Thể lệ</button>
+
+        <div class="byhung">by Hùng 💖</div>
+    </div>
 </div>
 
-<!-- Rules separated (outside login) -->
-<div id="rulesBox" role="region" aria-label="Thể lệ">
-  <strong>📜 Thể lệ (tách riêng)</strong>
-  <div style="margin-top:6px;line-height:1.45">
-    ⚡ +10 điểm<br>
-    ❤️ +1 điểm<br>
-    💎 +2 điểm<br>
-    🍀 +5 điểm<br>
-    🎁 +3 điểm<br>
-    🌝 Bấm vào → trừ 1–200 điểm (không bấm thì không sao)<br>
-    Mỗi người chơi có <strong>10 mạng</strong><br>
-    Thanh đỏ cuối khung: các icon (ngoại trừ 🌝) nếu rơi chạm → mất 1 mạng<br>
-    Shop đổi điểm: 1500 → 10k, 3000 → 20k
-  </div>
+<!-- POPUP THỂ LỆ -->
+<div id="rulesModal" class="rules-modal">
+    <div class="rules-content">
+        <h2>📜 Thể lệ</h2>
+
+        <p>⚡ +10 điểm</p>
+        <p>❤️ +1 điểm</p>
+        <p>💎 +2 điểm</p>
+        <p>🍀 +5 điểm</p>
+        <p>🎁 +3 điểm</p>
+        <p>🌝 Trừ 1–200 điểm khi BẤM (không bấm thì không sao)</p>
+        <p>🔻 Icon chạm thanh đỏ → mất 1 máu (trừ 🌝)</p>
+        <p>🛒 Shop → đổi điểm lấy quà</p>
+
+        <button id="closeRules" class="close-btn">Đóng</button>
+    </div>
 </div>
 
-<!-- BY -->
-<div id="byHung">by Hùng 💖</div>
+<!-- GAME -->
+<div id="gameScreen" class="game-screen">
 
-<!-- GAME WRAPPER (hidden until after ready) -->
-<div id="gameWrapper" aria-hidden="true">
-  <div id="gameCenter" role="application">
-    <div id="dangerLine"></div>
-    <!-- icons will be appended here -->
-  </div>
+    <div id="gameContainer">
+        <div id="iconArea"></div>
+        <div id="deathLine"></div>
+    </div>
+
+    <div class="bottomBar">
+        <div id="scoreDisplay">Điểm: 0</div>
+        <div id="healthDisplay">Máu: ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div>
+    </div>
+
+    <button id="shopBtn" class="shop-btn">🛒 Shop</button>
+
+    <div id="shopModal" class="shop-modal">
+        <div class="shop-box">
+            <h2>🎁 Đổi điểm</h2>
+
+            <button class="reward" data-cost="1500">1500 điểm → 10k</button>
+            <button class="reward" data-cost="3000">3000 điểm → 20k</button>
+
+            <button id="closeShop" class="close-shop">Đóng</button>
+        </div>
+    </div>
+
 </div>
 
-<!-- HUD under game (score + health) -->
-<div id="hud">
-  <div id="scoreboard">Điểm: 0 &nbsp; | &nbsp; Mạng: 10/10</div>
-</div>
-
-<!-- READY Modal (shown after login, before actual playing) -->
-<div id="readyModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-  <div id="readyText">Bạn đã sẵn sàng chưa?</div>
-  <button id="readyBtn">Bắt đầu</button>
-</div>
-
-<!-- SHOP Modal -->
-<div id="shopModal" class="modal" aria-hidden="true">
-  <h3>Shop — Đổi điểm</h3>
-  <div style="text-align:left">
-    <button class="exchangeOption" data-cost="1500" data-reward="10k">1500 điểm → 10k</button>
-    <button class="exchangeOption" data-cost="3000" data-reward="20k">3000 điểm → 20k</button>
-  </div>
-  <div id="exchangeInfo" style="margin-top:10px;color:#222;font-size:14px"></div>
-  <button id="closeShopBtn">Đóng</button>
-</div>
-
-<!-- EXCHANGE CONFIRM Modal -->
-<div id="exchangeConfirmModal" class="modal" aria-hidden="true">
-  <div id="exchangeConfirmText"></div>
-  <button id="exchangeConfirmOk">OK</button>
-</div>
-
-<!-- GAME OVER Modal -->
-<div id="gameOverModal" class="modal" aria-hidden="true">
-  <div id="gameOverText">💀 Thua òi! May mắn lần sau 🍀</div>
-  <button id="playAgainBtn">Chơi lại 🔄</button>
-</div>
 
 <script>
-/* ---------------------------
-   Variables & DOM references
-   --------------------------- */
-const body = document.body;
-const intro = document.getElementById('intro');
-const playerNameInput = document.getElementById('playerNameInput');
-const startBtn = document.getElementById('startBtn');
-
-const gameWrapper = document.getElementById('gameWrapper');
-const gameCenter = document.getElementById('gameCenter');
-const hud = document.getElementById('hud');
-const scoreboard = document.getElementById('scoreboard');
-
-const readyModal = document.getElementById('readyModal');
-const readyBtn = document.getElementById('readyBtn');
-
-const shopModal = document.getElementById('shopModal');
-const closeShopBtn = document.getElementById('closeShopBtn');
-const exchangeOptions = document.querySelectorAll('.exchangeOption');
-const exchangeInfo = document.getElementById('exchangeInfo');
-
-const exchangeConfirmModal = document.getElementById('exchangeConfirmModal');
-const exchangeConfirmText = document.getElementById('exchangeConfirmText');
-const exchangeConfirmOk = document.getElementById('exchangeConfirmOk');
-
-const gameOverModal = document.getElementById('gameOverModal');
-const playAgainBtn = document.getElementById('playAgainBtn');
-
-let playerName = '';
-let score = 0;
-let maxHealth = 10;
-let health = maxHealth;
 let gameRunning = false;
-let spawnTimer = null;
+let score = 0;
+let health = 10;
+let spawnSpeed = 850;
+let inLogin = true;
 
-/* icon definitions & rates */
-const iconTypes = [
-  {icon:'⚡', point:10, rate:0.20},
-  {icon:'❤️', point:1, rate:0.30},
-  {icon:'💎', point:2, rate:0.15},
-  {icon:'🍀', point:5, rate:0.10},
-  {icon:'🎁', point:3, rate:0.10},
-  {icon:'🌝', point:0, rate:0.15} // special: random -1..-200 when clicked
+const loginScreen = document.getElementById("loginScreen");
+const gameScreen = document.getElementById("gameScreen");
+const nameInput = document.getElementById("playerName");
+const loginBtn = document.getElementById("loginBtn");
+
+const scoreDisplay = document.getElementById("scoreDisplay");
+const healthDisplay = document.getElementById("healthDisplay");
+const iconArea = document.getElementById("iconArea");
+
+function updateHealth() {
+    let hearts = "";
+    for (let i=0;i<health;i++) hearts += "❤️";
+    healthDisplay.innerHTML = "Máu: " + hearts;
+}
+
+loginBtn.onclick = () => {
+    if (!nameInput.value.trim()) return;
+
+    inLogin = false;
+
+    loginScreen.style.display = "none";
+    gameScreen.style.display = "block";
+
+    setTimeout(() => {
+        alert("Bạn đã sẵn sàng chưa?");
+        gameRunning = true;
+        spawnLoop();
+    }, 200);
+};
+
+const icons = [
+    { emoji:"⚡", point:10 },
+    { emoji:"❤️", point:1 },
+    { emoji:"💎", point:2 },
+    { emoji:"🍀", point:5 },
+    { emoji:"🎁", point:3 },
+    { emoji:"🌝", point:"minus" }
 ];
 
-/* Helper: pick icon by rates */
-function pickIcon(){
-  const r = Math.random();
-  let s = 0;
-  for(const it of iconTypes){ s += it.rate; if(r <= s) return it; }
-  return iconTypes[0];
-}
+function spawnIcon() {
+    if (!gameRunning) return;
 
-/* --- LocalStorage keys per playerName --- */
-function saveData(){
-  if(!playerName) return;
-  try {
-    localStorage.setItem('flowgame_'+playerName, JSON.stringify({score, health}));
-  } catch(e){}
-}
-function loadDataIfExists(name){
-  try {
-    const raw = localStorage.getItem('flowgame_'+name);
-    if(!raw) return null;
-    return JSON.parse(raw);
-  } catch(e){ return null; }
-}
+    const icon = document.createElement("div");
+    icon.classList.add("icon");
 
-/* --- Login logic --- */
-let startBtnClicked = false;
-startBtn.addEventListener('click', ()=>{
-  if(startBtnClicked) return; // only once
-  const name = playerNameInput.value.trim();
-  if(!name) { alert('Nhập tên trước!'); playerNameInput.focus(); return; }
-  startBtnClicked = true;
-  playerName = name;
-  const saved = loadDataIfExists(playerName);
-  if(saved){
-    score = saved.score ?? 0;
-    health = saved.health ?? maxHealth;
-    showWelcomeBack();
-  } else {
-    score = 0; health = maxHealth;
-    showWelcomeNew();
-  }
+    const pick = icons[Math.floor(Math.random()*icons.length)];
+    icon.innerHTML = pick.emoji;
 
-  // Hide login form but keep background (login scene gone)
-  intro.style.display = 'none';
+    icon.style.left = Math.random() * 240 + "px";
 
-  // Show ready modal
-  readyModal.style.display = 'block';
-  readyModal.setAttribute('aria-hidden','false');
-
-  // set body to game-page to keep consistent bg (prevents white flash)
-  body.classList.remove('login-page');
-  body.classList.add('game-page');
-});
-
-/* Welcome text variations */
-function showWelcomeBack(){
-  // small toast-like update inside ready modal
-  readyModal.querySelector('#readyText').textContent = `Chúc mừng đã quay lại, ${playerName}! 🎉`;
-}
-function showWelcomeNew(){
-  readyModal.querySelector('#readyText').textContent = `Chào mừng đến với game của Hùng, ${playerName}! 🥳`;
-}
-
-/* --- Ready -> actual show game UI (but not spawning until press start in modal) --- */
-readyBtn.addEventListener('click', ()=>{
-  // hide ready modal
-  readyModal.style.display = 'none';
-  readyModal.setAttribute('aria-hidden','true');
-
-  // show game wrapper & HUD & controls
-  gameWrapper.style.display = 'block';
-  hud.style.display = 'block';
-  updateScoreboard();
-
-  // show shop button (we implement shop as opening modal)
-  // Shop should be accessible only in-game; we create clickable region top-right by keyboard? For simplicity we open via keyboard 'S'
-  // But we also allow clicking the game wrapper area top-right to open shop via context - simpler: add keybind
-  // (Note: per request, shop UI present but hidden at login; we'll show modal via key 's' or double tap on right area)
-  // For user convenience, show a small clickable area top-right inside gameCenter:
-  createControls();
-});
-
-/* createControls: small visible shop/exchange/rules icons inside game area (right side) */
-function createControls(){
-  // add small buttons overlay inside gameCenter if not exist
-  if(document.getElementById('controlArea')) return;
-  const area = document.createElement('div');
-  area.id = 'controlArea';
-  area.style.position = 'absolute';
-  area.style.right = '8px';
-  area.style.top = '8px';
-  area.style.zIndex = 40;
-  // shop button
-  const shopBtn = document.createElement('button');
-  shopBtn.textContent = '🛒';
-  shopBtn.title = 'Shop (pause)';
-  shopBtn.style.margin = '4px'; shopBtn.style.padding='6px'; shopBtn.style.border='none'; shopBtn.style.borderRadius='8px';
-  shopBtn.style.background='#ff4d94'; shopBtn.style.color='#fff'; shopBtn.style.cursor='pointer';
-  shopBtn.onclick = ()=>{ openShop(); };
-  // exchange button (duplicate functionality inside shop, but per req "shop on right" included)
-  const exchangeBtn = document.createElement('button');
-  exchangeBtn.textContent = '💰';
-  exchangeBtn.title = 'Đổi điểm';
-  exchangeBtn.style.margin='4px'; exchangeBtn.style.padding='6px'; exchangeBtn.style.border='none'; exchangeBtn.style.borderRadius='8px';
-  exchangeBtn.style.background='#ff4d94'; exchangeBtn.style.color='#fff'; exchangeBtn.style.cursor='pointer';
-  exchangeBtn.onclick = ()=>{ openShop(); };
-  // rules button
-  const rulesBtn = document.createElement('button');
-  rulesBtn.textContent = '❔';
-  rulesBtn.title = 'Thể lệ';
-  rulesBtn.style.margin='4px'; rulesBtn.style.padding='6px'; rulesBtn.style.border='none'; rulesBtn.style.borderRadius='8px';
-  rulesBtn.style.background='#ff4d94'; rulesBtn.style.color='#fff'; rulesBtn.style.cursor='pointer';
-  rulesBtn.onclick = ()=>{ openRules(); };
-  area.appendChild(shopBtn);
-  area.appendChild(exchangeBtn);
-  area.appendChild(rulesBtn);
-  gameCenter.appendChild(area);
-}
-
-/* --- Spawn logic --- */
-function startSpawning(){
-  if(gameRunning) return;
-  gameRunning = true;
-  spawnLoop();
-}
-function stopSpawning(){
-  gameRunning = false;
-  if(spawnTimer) { clearTimeout(spawnTimer); spawnTimer = null; }
-}
-/* spawn loop: schedules spawn with random interval 300-1000ms */
-function spawnLoop(){
-  if(!gameRunning) return;
-  spawnIcon();
-  const next = Math.random()*700 + 300; // 0.3 - 1s
-  spawnTimer = setTimeout(spawnLoop, next);
-}
-
-/* spawnIcon: creates element, falls, handles click and bottom collision */
-function spawnIcon(){
-  if(!gameRunning) return;
-  const it = pickIcon();
-  const el = document.createElement('div');
-  el.className = 'icon';
-  el.textContent = it.icon;
-  // position inside gameCenter (width available)
-  const gw = gameCenter.clientWidth;
-  const maxLeft = Math.max(10, gw - 60);
-  el.style.left = (10 + Math.random() * maxLeft) + 'px';
-  el.style.top = '-60px';
-  gameCenter.appendChild(el);
-
-  // fall speed 0.5 - 2 px per 20ms (moderate)
-  const fallSpeed = Math.random()*1.5 + 0.5;
-  let falling = true;
-  const ticker = setInterval(()=>{
-    if(!falling){ clearInterval(ticker); return; }
-    if(!gameRunning){ /* pause fallback */ return; }
-    const top = parseFloat(el.style.top) || 0;
-    el.style.top = (top + fallSpeed) + 'px';
-    // check bottom collision relative to gameCenter height
-    const gwH = gameCenter.clientHeight;
-    if(top + fallSpeed + 48 >= gwH - 6){ // touched danger area (6px)
-      // remove
-      falling = false;
-      el.remove();
-      clearInterval(ticker);
-      // if not 🌝 then lose 1 health
-      if(it.icon !== '🌝'){
-        if(playerName !== 'hungadmin'){
-          health = Math.max(0, health - 1);
-          updateScoreboard();
-          saveData();
-          if(health <= 0) triggerGameOver();
+    icon.onclick = () => {
+        if (pick.point === "minus") {
+            let loss = Math.floor(Math.random()*200)+1;
+            score -= loss;
+        } else {
+            score += pick.point;
         }
-      }
-    }
-  }, 20);
+        scoreDisplay.innerText = "Điểm: " + score;
+        icon.remove();
+    };
 
-  /* click handling */
-  el.addEventListener('click', (ev)=>{
-    if(!gameRunning) return;
-    // clicking should immediately remove and process effect
-    el.remove();
-    falling = false;
-    clearInterval(ticker);
-    if(it.icon === '🌝'){
-      const lost = Math.floor(Math.random()*200) + 1;
-      score -= lost;
-      showMinusPopup('-'+lost, ev.clientX, ev.clientY);
-    } else {
-      score += it.point;
-    }
-    updateScoreboard();
-    saveData();
-  });
+    iconArea.appendChild(icon);
+
+    let fall = setInterval(() => {
+        if (!gameRunning) return;
+
+        let y = parseInt(icon.style.top || -40);
+        icon.style.top = (y + 6) + "px";
+
+        if (y > 360) {
+            if (pick.point !== "minus") {
+                health--;
+                updateHealth();
+            }
+            icon.remove();
+            clearInterval(fall);
+        }
+
+        if (health <= 0) {
+            gameRunning = false;
+            alert("💀 Thua rồi!");
+        }
+
+    }, 28);
 }
 
-/* show minus popup near click */
-function showMinusPopup(text, x, y){
-  const p = document.createElement('div');
-  p.id = 'minusPopup';
-  p.textContent = text;
-  // position relative to viewport
-  p.style.left = (x ? (x - 20) : (window.innerWidth/2 - 20)) + 'px';
-  p.style.top = (y ? (y - 30) : (window.innerHeight/2 - 20)) + 'px';
-  document.body.appendChild(p);
-  setTimeout(()=>{ p.remove(); }, 900);
+function spawnLoop() {
+    spawnIcon();
+    setTimeout(spawnLoop, spawnSpeed);
 }
 
-/* update HUD & scoreboard */
-function updateScoreboard(){
-  const displayScore = (playerName === 'hungadmin') ? '∞' : score;
-  const displayHealth = (playerName === 'hungadmin') ? '∞' : health;
-  scoreboard.textContent = `Điểm: ${displayScore}  |  Mạng: ${displayHealth}/${maxHealth}`;
-}
-
-/* --- Ready modal start button triggers only spawning start (gameRunning true) --- */
-readyBtn.addEventListener('click', ()=>{
-  // close ready modal
-  readyModal.style.display = 'none';
-  // start spawn
-  startSpawning();
+/* SHOP */
+document.querySelectorAll(".reward").forEach(btn=>{
+    btn.onclick = () => {
+        let cost = Number(btn.dataset.cost);
+        if (score >= cost) {
+            alert("📸 Cap màn hình và gửi cho Hùng 💖");
+        } else {
+            alert("Chưa đủ điểm 😢");
+        }
+    };
 });
 
-/* --- Shop & Exchange logic (opens modal and pauses game) --- */
-function openShop(){
-  // pause
-  stopSpawning();
-  shopModal.style.display = 'block';
-  shopModal.setAttribute('aria-hidden','false');
-  exchangeInfo.textContent = '';
-}
-closeShopBtn.addEventListener('click', ()=>{
-  shopModal.style.display = 'none';
-  shopModal.setAttribute('aria-hidden','true');
-  // resume
-  if(playerName !== 'hungadmin'){
-    startSpawning();
-  } else {
-    startSpawning();
-  }
-});
-exchangeOptions.forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const cost = parseInt(btn.dataset.cost,10);
-    const reward = btn.dataset.reward;
-    if(playerName === 'hungadmin' || score >= cost){
-      exchangeConfirmText.textContent = `Bạn đã đổi ${cost} điểm → ${reward}.\n📸 Cap màn hình gửi cho Hùng để nhận thưởng 💰`;
-      // if not hungadmin, deduct points locally
-      if(playerName !== 'hungadmin') score -= cost;
-      saveData();
-      updateScoreboard();
-    } else {
-      exchangeConfirmText.textContent = `Xin lỗi, chưa đủ điểm 🥹 (Cần ${cost} điểm)`;
-    }
-    // show confirm modal
-    exchangeConfirmModal.style.display = 'block';
-    exchangeConfirmModal.setAttribute('aria-hidden','false');
-  });
-});
-exchangeConfirmOk.addEventListener('click', ()=>{
-  exchangeConfirmModal.style.display = 'none';
-  exchangeConfirmModal.setAttribute('aria-hidden','true');
-});
+document.getElementById("shopBtn").onclick = () => {
+    gameRunning = false;
+    document.getElementById("shopModal").style.display = "flex";
+};
 
-/* --- Rules open (from control) --- */
-function openRules(){
-  // pause spawn
-  stopSpawning();
-  // show rules modal (reuse shop modal spacing)
-  // We'll use exchangeConfirmModal to show rules for simplicity
-  exchangeConfirmText.textContent = `Thể lệ:\n⚡ +10, ❤️ +1, 💎 +2, 🍀 +5, 🎁 +3\n🌝 bấm để trừ 1–200\nThanh đỏ cuối khung: icon (ngoại trừ 🌝) chạm => mất 1 mạng\nBạn có 10 mạng.`;
-  exchangeConfirmModal.style.display = 'block';
-  exchangeConfirmModal.setAttribute('aria-hidden','false');
-}
+document.getElementById("closeShop").onclick = () => {
+    document.getElementById("shopModal").style.display = "none";
+    gameRunning = true;
+};
 
-/* --- Game over handling --- */
-function triggerGameOver(){
-  stopSpawning();
-  gameOverModal.style.display = 'block';
-  gameOverModal.setAttribute('aria-hidden','false');
-}
-/* Play again: reset health only, keep score */
-playAgainBtn.addEventListener('click', ()=>{
-  health = maxHealth;
-  updateScoreboard();
-  gameOverModal.style.display = 'none';
-  if(playerName !== 'hungadmin'){
-    startSpawning();
-  } else {
-    startSpawning();
-  }
-  saveData();
-});
+/* THỂ LỆ */
+document.getElementById("rulesBtn").onclick = () => {
+    document.getElementById("rulesModal").style.display = "flex";
+};
 
-/* --- Save periodically --- */
-setInterval(()=>{ saveData(); }, 2000);
-
-/* --- keyboard shortcuts: s to open shop, r to open rules (for testing) --- */
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 's' || e.key === 'S'){ openShop(); }
-  if(e.key === 'r' || e.key === 'R'){ openRules(); }
-});
-
-/* expose openRules for control buttons earlier */
-window.openRules = openRules;
-
-/* expose openShop for control buttons earlier */
-window.openShop = openShop;
-
-/* initial update */
-updateScoreboard();
-
-/* Accessibility: ensure player can press Enter to submit login */
-playerNameInput.addEventListener('keydown',(e)=>{
-  if(e.key === 'Enter'){ startBtn.click(); }
-});
+document.getElementById("closeRules").onclick = () => {
+    document.getElementById("rulesModal").style.display = "none";
+};
 </script>
+
 </body>
-  </html>
+</html>
