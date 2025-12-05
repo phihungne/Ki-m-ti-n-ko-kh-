@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> Hùng tạo công ăn việc làm</title>
+<title>Flow Game by Hùng</title>
 <style>
 body{
   margin:0; font-family:sans-serif;
   background: linear-gradient(135deg,#ffc0cb,#ffe4e1);
   overflow:hidden;
 }
-
 /* LOGIN / INTRO */
 @keyframes shake {
   0% { transform: translate(-50%, -50%) translateX(0); }
@@ -33,7 +32,6 @@ body{
   cursor:pointer; transition:0.2s;
 }
 #startBtn:hover{transform:scale(1.2);}
-
 /* READY MODAL */
 #readyModal{
   display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.5);
@@ -43,7 +41,6 @@ body{
 #readyModal.show{opacity:1; transform:translate(-50%,-50%) scale(1);}
 #readyModal button{margin-top:15px; padding:10px 20px; cursor:pointer; border:none;
   border-radius:8px; background:#ff69b4; color:#fff; font-size:1em;}
-
 /* GAME CONTAINER */
 #gameContainer{display:none; flex-direction:column; align-items:center; width:80vw; margin:20px auto;}
 #gameDiv{
@@ -59,11 +56,9 @@ body{
 #scoreboard{font-size:1.5em; color:#333;}
 #healthBar{width:80%; height:20px; background:#eee; border-radius:10px; overflow:hidden; margin:5px auto;}
 #healthBarInner{width:100%; height:100%; background:pink; transition:0.3s;}
-
 /* ICON */
 .icon{position:absolute; font-size:2em; cursor:pointer; user-select:none; transition: transform 0.2s, filter 0.2s;}
 .icon:hover{transform:scale(1.5); filter:drop-shadow(0 0 5px #fff);}
-
 /* BUTTONS OUTSIDE */
 #rulesBtn,#exchangeBtn{
   position:absolute; top:10px; padding:10px 15px; border:none; border-radius:8px;
@@ -71,7 +66,6 @@ body{
 }
 #rulesBtn{left:10px;}
 #exchangeBtn{right:10px;}
-
 /* MODALS */
 #rulesModal,#gameOverModal,#exchangeModal{
   display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
@@ -81,11 +75,9 @@ body{
 #rulesModal button,#gameOverModal button,#exchangeModal button{
   padding:10px 20px; margin-top:15px; cursor:pointer; border:none; border-radius:8px; background:#ff69b4; color:#fff;
 }
-
 /* BY HUNG */
 #byHung{position:absolute; bottom:10px; left:10px; color:#fff; font-weight:bold; font-size:1em; text-shadow:1px 1px 2px rgba(0,0,0,0.5); animation:fall 3s infinite;}
 @keyframes fall{0%{transform:translateY(-20px); opacity:0;} 50%{opacity:1;} 100%{transform:translateY(0); opacity:1;}}
-
 /* POPUP TRỪ ĐIỂM */
 #minusPopup{position:absolute; color:red; font-weight:bold; font-size:1.5em; animation:rise 1s forwards; pointer-events:none;}
 @keyframes rise{0%{transform:translateY(0);opacity:1;} 100%{transform:translateY(-50px);opacity:0;}}
@@ -95,7 +87,7 @@ body{
 
 <!-- LOGIN / INTRO -->
 <div id="intro">
-  <h1 id="welcomeText"> Kím tiền ko khó 🤑</h1>
+  <h1 id="welcomeText">Nhấp vô là có xiền 🤑</h1>
   <input type="text" id="playerNameInput" placeholder="Nhập tên của bạn">
   <button id="startBtn">Bắt đầu</button>
 </div>
@@ -140,7 +132,9 @@ body{
 <!-- EXCHANGE MODAL -->
 <div id="exchangeModal">
   <h2>Đổi điểm sang phần thưởng</h2>
-  <p id="exchangeInfo"></p>
+  <p id="exchangeInfo">Chọn phần thưởng:</p>
+  <button class="exchangeOption" data-cost="1500" data-reward="10k">1500 điểm → 10k</button>
+  <button class="exchangeOption" data-cost="3000" data-reward="20k">3000 điểm → 20k</button>
   <button id="confirmExchange">Xác nhận</button>
 </div>
 
@@ -223,7 +217,8 @@ function spawnIcons(){
   iconEl.style.top='-50px';
   gameDiv.appendChild(iconEl);
 
-  const fallSpeed = Math.random() * 3 + 2; // 2~5px/20ms
+  // ✅ TỐC ĐỘ RƠI VỪA PHẢI
+  const fallSpeed = Math.random() * 1.5 + 0.5; // 0.5~2px/20ms
   const fallInterval=setInterval(()=>{
     let top=parseFloat(iconEl.style.top);
     if(top + 50 >= gameRect.height){
@@ -279,7 +274,7 @@ function checkGameOver(){
   }
 }
 document.getElementById('playAgainBtn').addEventListener('click',()=>{
-  score=0; health=maxHealth;
+  health = maxHealth; // reset mạng
   gameOverModal.style.display='none';
   gameRunning=true;
   updateScoreBoard();
@@ -299,10 +294,20 @@ const exchangeModal=document.getElementById('exchangeModal');
 const exchangeInfo=document.getElementById('exchangeInfo');
 const confirmExchange=document.getElementById('confirmExchange');
 
+document.querySelectorAll('.exchangeOption').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const cost=parseInt(btn.dataset.cost);
+    const reward=btn.dataset.reward;
+    if(score>=cost){
+      exchangeInfo.textContent=`Bạn đã đổi ${cost} điểm sang ${reward}! 📸 Cap màn hình gửi Hùng để nhận thưởng 💰`;
+    } else {
+      exchangeInfo.textContent=`Xin lỗi, chưa đủ điểm 🥹 (Cần ${cost} điểm)`;
+    }
+  });
+});
+
 exchangeBtn.addEventListener('click',()=>{
   gameRunning=false;
-  if(score>=1500) exchangeInfo.textContent="Bạn có đủ điểm! 📸 Cap màn hình gửi cho Hùng để nhận thưởng 💰";
-  else exchangeInfo.textContent="Xin lỗi, chưa đủ điểm nha ní 🥹";
   exchangeModal.style.display='block';
 });
 
